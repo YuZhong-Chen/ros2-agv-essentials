@@ -1,0 +1,25 @@
+/* Reference: https://aka.ms/devcontainer.json */
+{
+    "name": "Turtlebot3 Workspace",
+    "dockerComposeFile": "../docker/compose.yaml",
+    "service": "turtlebot3_ws",
+    // workspace settings
+    "workspaceFolder": "/home/ros2-agv-essentials/turtlebot3_ws",
+    // Vscode extensions
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ms-vscode.cpptools-themes",
+                "twxs.cmake",
+                "donjayamanne.python-extension-pack",
+                "eamodio.gitlens",
+                "mhutchie.git-graph",
+                "streetsidesoftware.code-spell-checker",
+                "ms-iot.vscode-ros"
+            ]
+        }
+    },
+    // Lifecycle scripts
+    "postCreateCommand": "${containerWorkspaceFolder}/.devcontainer/postCreateCommand.sh"
+}
