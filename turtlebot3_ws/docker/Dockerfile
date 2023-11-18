@@ -47,11 +47,17 @@ RUN apt-get update && apt-get install -y \
 
 # Install dependency
 RUN apt-get update && apt-get install -y \
+    # Turtlebot3
     ros-$ROS_DISTRO-turtlebot3-msgs \
     ros-$ROS_DISTRO-cartographer-ros \
     ros-$ROS_DISTRO-nav2-bringup \
     ros-$ROS_DISTRO-dynamixel-sdk \
     ros-$ROS_DISTRO-hls-lfcd-lds-driver \
+    # Groot
+    qtbase5-dev \
+    libqt5svg5-dev \
+    libzmq3-dev \
+    libdw-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY .bashrc /home/$USERNAME/.bashrc
