@@ -45,6 +45,15 @@ RUN apt-get update && apt-get install -y \
     ros-$ROS_DISTRO-rviz2 \
     && rm -rf /var/lib/apt/lists/*
 
+# Install dependency
+RUN apt-get update && apt-get install -y \
+    ros-$ROS_DISTRO-turtlebot3-msgs \
+    ros-$ROS_DISTRO-cartographer-ros \
+    ros-$ROS_DISTRO-nav2-bringup \
+    ros-$ROS_DISTRO-dynamixel-sdk \
+    ros-$ROS_DISTRO-hls-lfcd-lds-driver \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY .bashrc /home/$USERNAME/.bashrc
 
 # [Optional] Set the default user. Omit if you want to keep the default as root.
