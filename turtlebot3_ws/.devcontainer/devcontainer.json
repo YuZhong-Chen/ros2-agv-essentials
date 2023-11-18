@@ -16,7 +16,9 @@
                 "eamodio.gitlens",
                 "mhutchie.git-graph",
                 "streetsidesoftware.code-spell-checker",
-                "ms-iot.vscode-ros"
+                "ms-iot.vscode-ros",
+                "github.copilot",
+                "cweijan.vscode-office"
             ]
         }
     },
