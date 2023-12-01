@@ -54,6 +54,12 @@ RUN apt-get update && apt-get install -y \
     ros-$ROS_DISTRO-joint-state-broadcaster \
     ros-$ROS_DISTRO-ecl-tools \
     ros-$ROS_DISTRO-diagnostics \
+    #
+    # Install navigation dependencies
+    ros-$ROS_DISTRO-navigation2 \
+    ros-$ROS_DISTRO-nav2-bringup \
+    ros-$ROS_DISTRO-slam-toolbox \
+    ros-$ROS_DISTRO-robot-localization \
     && rm -rf /var/lib/apt/lists/*
 
 COPY .bashrc /home/$USERNAME/.bashrc
