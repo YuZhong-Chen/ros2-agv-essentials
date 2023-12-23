@@ -45,6 +45,22 @@ RUN apt-get update && apt-get install -y \
     ros-$ROS_DISTRO-rviz2 \
     && rm -rf /var/lib/apt/lists/*
 
+# Install nav2 dependencies
+RUN apt-get update && apt-get install -y \
+    ros-$ROS_DISTRO-ompl \
+    ros-$ROS_DISTRO-slam-toolbox \
+    ros-$ROS_DISTRO-bondcpp \
+    ros-$ROS_DISTRO-diagnostic-updater \
+    ros-$ROS_DISTRO-test-msgs \
+    ros-$ROS_DISTRO-behaviortree-cpp-v3 \
+    nlohmann-json3-dev \
+    libxtensor-dev \
+    libomp-dev \
+    libbenchmark-dev \
+    python3-zmq \
+    lcov \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY .bashrc /home/$USERNAME/.bashrc
 
 # [Optional] Set the default user. Omit if you want to keep the default as root.
