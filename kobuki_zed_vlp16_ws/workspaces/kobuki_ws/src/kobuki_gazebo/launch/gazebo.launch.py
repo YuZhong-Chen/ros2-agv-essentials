@@ -54,6 +54,12 @@ def generate_launch_description():
             ":",
             get_package_share_directory("kobuki_gazebo") + "/models/turtlebot3",
             ":",
+            get_package_share_directory("kobuki_gazebo") + "/models/aws_hospital",
+            ":",
+            get_package_share_directory("kobuki_gazebo") + "/models/aws_warehouse",
+            ":",
+            get_package_share_directory("kobuki_gazebo") + "/models/fuel_models",
+            ":",
             EnvironmentVariable("GAZEBO_MODEL_PATH", default_value=""),
         ],
     )
