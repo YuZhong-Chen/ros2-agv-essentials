@@ -1,0 +1,6 @@
+[submodule "kobuki_zed_vlp16_ws/workspaces/kobuki_ws/src/aws_worlds/aws_warehouse"]
+	path = kobuki_zed_vlp16_ws/workspaces/kobuki_ws/src/aws_worlds/aws_warehouse
+	url = https://github.com/aws-robotics/aws-robomaker-small-warehouse-world.git
+[submodule "kobuki_zed_vlp16_ws/workspaces/kobuki_ws/src/aws_worlds/aws_hospital"]
+	path = kobuki_zed_vlp16_ws/workspaces/kobuki_ws/src/aws_worlds/aws_hospital
+	url = git@github.com:aws-robotics/aws-robomaker-hospital-world.git
