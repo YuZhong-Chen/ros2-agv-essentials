@@ -40,7 +40,7 @@ from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
     urdf_default_path = PathJoinSubstitution(
-        [FindPackageShare("kobuki_description"), "urdf", "kobuki_VLP16.urdf.xacro"]
+        [FindPackageShare("kobuki_description"), "urdf", "kobuki_zed_VLP16.urdf.xacro"]
     )
 
     ARGUMENTS = [
@@ -60,6 +60,11 @@ def generate_launch_description():
             description="Enable VLP-16 sensor",
         ),
         DeclareLaunchArgument(
+            name="zed_enabled",
+            default_value="true",
+            description="Enable ZED camera",
+        ),
+        DeclareLaunchArgument(
             name="urdf",
             default_value=urdf_default_path,
             description="URDF path",
@@ -76,6 +81,9 @@ def generate_launch_description():
             " ",
             "VLP16_enabled:=",
             LaunchConfiguration("VLP16_enabled"),
+            " ",
+            "zed_enabled:=",
+            LaunchConfiguration("zed_enabled"),
         ]
     )
 
