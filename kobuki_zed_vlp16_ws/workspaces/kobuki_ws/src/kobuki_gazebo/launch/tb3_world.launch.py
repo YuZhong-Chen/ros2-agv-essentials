@@ -16,7 +16,7 @@ def generate_launch_description():
     world_file = PathJoinSubstitution(
         [
             FindPackageShare("kobuki_gazebo"),
-            "worlds",
+            "worlds/turtlebot3",
             "turtlebot3_stage_1.world",
         ],
     )

@@ -52,7 +52,7 @@ def generate_launch_description():
                 Path(get_package_share_directory("kobuki_description")).parent.resolve()
             ),
             ":",
-            get_package_share_directory("kobuki_gazebo") + "/models",
+            get_package_share_directory("kobuki_gazebo") + "/models/turtlebot3",
             ":",
             EnvironmentVariable("GAZEBO_MODEL_PATH", default_value=""),
         ],
