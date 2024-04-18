@@ -1,0 +1,25 @@
+/* Reference: https://aka.ms/devcontainer.json */
+{
+    "name": "RL Agent",
+    "dockerComposeFile": "../docker/compose.yaml",
+    "service": "rl-ws",
+    // workspace settings
+    "workspaceFolder": "/home/ros2-agv-essentials/rl_ws",
+    // Vscode extensions
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ms-vscode.cpptools-themes",
+                "twxs.cmake",
+                "donjayamanne.python-extension-pack",
+                "eamodio.gitlens",
+                "mhutchie.git-graph",
+                "streetsidesoftware.code-spell-checker",
+                "ms-iot.vscode-ros"
+            ]
+        }
+    },
+    // Lifecycle scripts
+    "postCreateCommand": "${containerWorkspaceFolder}/.devcontainer/postCreateCommand.sh"
+}
