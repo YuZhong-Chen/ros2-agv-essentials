@@ -22,7 +22,7 @@ def generate_launch_description():
         [
             FindPackageShare("kobuki_gazebo"),
             "worlds/turtlebot3",
-            "turtlebot3_stage_1.world",
+            "empty.world",
         ],
     )
 

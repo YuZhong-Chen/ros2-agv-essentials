@@ -20,6 +20,7 @@ class GAZEBO_RL_ENV_NODE(Node):
         self.config = {
             "step_time_delta": 0.05,  # seconds
             "gazebo_service_timeout": 1.0,  # seconds
+            "reach_target_distance": 0.2,  # meters
         }
 
         self.current_timestamp = 0
@@ -35,6 +36,8 @@ class GAZEBO_RL_ENV_NODE(Node):
         # Load the ball URDF
         ball_urdf_path = os.path.join(get_package_share_directory("gazebo_rl_env"), "urdf", "ball.urdf")
         self.ball_urdf = open(ball_urdf_path, "r").read()
+        
+        self.target_list = self.generate_target()
 
     def reset(self):
         self.current_timestamp = 0
@@ -61,6 +64,15 @@ class GAZEBO_RL_ENV_NODE(Node):
         while not self.pause_client.wait_for_service(timeout_sec=self.config["gazebo_service_timeout"]):
             self.get_logger().info('Gazebo service "pause" not available, waiting again...')
         self.pause_client.call_async(Empty.Request())
+        
+        # Check whether the Kobuki reaches the target
+        state = self.get_kobuki_state()
+        for target in self.target_list:
+            distance = target.get_distance(state)
+            if distance < self.config["reach_target_distance"]:
+                self.delete_ball(target.name)
+                self.target_list.remove(target)
+                self.get_logger().info(f"Kobuki reaches target {target.name} at timestamp {self.current_timestamp}")
 
     def spawn_ball(self, x: float, y: float, z: float, name: str):
         self.spawn_ball_request = SpawnEntity.Request()
@@ -114,3 +126,29 @@ class GAZEBO_RL_ENV_NODE(Node):
         # self.get_logger().info(f"Kobuki position: ({kobuki_pose.position.x}, {kobuki_pose.position.y}, {kobuki_pose.position.z})")
 
         return response.state
+
+    def generate_target(self):
+        target_list = []
+        
+        # Generate 10 targets with random y coordinates, and fixed x and z coordinates
+        for i in range(10):
+            x = 2.0 * (i + 1)
+            y = np.random.uniform(-1.0, 1.0)
+            z = 0.2
+            name = "target_" + str(i)
+            self.spawn_ball(x, y, z, name)
+            target_list.append(TARGET(x, y, z, name))
+
+        return target_list
+
+class TARGET:
+    def __init__(self, x: float, y: float, z: float, name: str):
+        self.x = x
+        self.y = y
+        self.z = z
+        self.name = name
+    
+    def get_distance(self, state):
+        # Calculate the Euclidean distance between the target and the state,
+        # note that we only consider the x and y coordinates.
+        return math.sqrt((self.x - state.pose.position.x) ** 2 + (self.y - state.pose.position.y) ** 2)
