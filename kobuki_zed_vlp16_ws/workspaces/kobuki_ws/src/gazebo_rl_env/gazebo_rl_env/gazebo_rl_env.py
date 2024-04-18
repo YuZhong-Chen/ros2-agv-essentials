@@ -81,3 +81,16 @@ class GAZEBO_RL_ENV_NODE(Node):
         while not self.delete_entity_client.wait_for_service(timeout_sec=self.config["gazebo_service_timeout"]):
             self.get_logger().info('Gazebo service "delete_entity" not available, waiting again...')
         self.delete_entity_client.call_async(self.delete_ball_request)
+    
+    def spawn_kobuki(self, x: float, y: float, z: float, yaw: float):
+        # Use system call to spawn the Kobuki robot
+        os.system(f"ros2 run gazebo_ros spawn_entity.py -entity kobuki -topic /robot_description -x {x} -y {y} -z {z} -Y {yaw}")
+
+    def delete_kobuki(self):
+        self.delete_kobuki_request = DeleteEntity.Request()
+        self.delete_kobuki_request.name = "kobuki"
+        
+        # Delete the Kobuki
+        while not self.delete_entity_client.wait_for_service(timeout_sec=self.config["gazebo_service_timeout"]):
+            self.get_logger().info('Gazebo service "delete_entity" not available, waiting again...')
+        self.delete_entity_client.call_async(self.delete_kobuki_request)
