@@ -12,7 +12,8 @@ ament_python_install_package(${PROJECT_NAME})
 # Install Python executables
 install(PROGRAMS scripts/main.py DESTINATION lib/${PROJECT_NAME})
 
-# Install launch files
+# Install files
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY urdf DESTINATION share/${PROJECT_NAME})
 
 ament_package()

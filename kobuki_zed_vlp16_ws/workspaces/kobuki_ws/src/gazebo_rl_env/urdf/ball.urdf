@@ -1,0 +1,19 @@
+<robot name="ball">
+    <link name="ball">
+        <inertial>
+            <mass value="1.0" />
+            <origin xyz="0 0 0" /> 
+            <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <sphere radius="0.1"/>
+            </geometry>
+        </visual>
+    </link>
+    <gazebo reference="ball">
+        <material>Gazebo/Yellow</material>
+        <turnGravityOff>true</turnGravityOff>
+    </gazebo>
+</robot>
