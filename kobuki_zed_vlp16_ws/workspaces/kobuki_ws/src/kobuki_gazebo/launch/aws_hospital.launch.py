@@ -9,6 +9,11 @@ ARGUMENTS = [
         default_value="False",
         description="Launch rviz2, by default is False",
     ),
+    DeclareLaunchArgument(
+        "spawn_kobuki",
+        default_value="True",
+        description="Spawn kobuki, by default is True",
+    ),
 ]
 
 def generate_launch_description():
@@ -33,6 +38,7 @@ def generate_launch_description():
         launch_arguments={
             "world_path": world_file,
             "launch_rviz": LaunchConfiguration("launch_rviz"),
+            "spawn_kobuki": LaunchConfiguration("spawn_kobuki"),
             "robot_init_x": "0.0",
             "robot_init_y": "1.0",
             "robot_init_z": "0.0",

@@ -32,6 +32,11 @@ ARGUMENTS = [
         description="Launch rviz2, by default is False",
     ),
     DeclareLaunchArgument(
+        "spawn_kobuki",
+        default_value="True",
+        description="Spawn kobuki, by default is True",
+    ),
+    DeclareLaunchArgument(
         "GAZEBO_MODEL_PATH",
         default_value="",
         description="The path to the gazebo models",
@@ -131,6 +136,7 @@ def generate_launch_description():
         launch_arguments={
             "use_sim_time": LaunchConfiguration("use_sim_time"),
         }.items(),
+        condition=IfCondition(LaunchConfiguration("spawn_kobuki")),
     )
 
     # Launch Kobuki's control
@@ -145,6 +151,7 @@ def generate_launch_description():
         launch_arguments={
             "use_sim_time": LaunchConfiguration("use_sim_time"),
         }.items(),
+        condition=IfCondition(LaunchConfiguration("spawn_kobuki")),
     )
 
     # Spawn robot
@@ -161,6 +168,7 @@ def generate_launch_description():
             "-Y", LaunchConfiguration("robot_init_yaw"),
         ],
         output="screen",
+        condition=IfCondition(LaunchConfiguration("spawn_kobuki")),
     )
 
     ld = LaunchDescription(ARGUMENTS)
