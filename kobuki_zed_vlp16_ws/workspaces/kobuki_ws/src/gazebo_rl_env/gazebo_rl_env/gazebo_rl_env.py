@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.node import Node
 
+from gazebo_msgs.srv import GetEntityState
 from gazebo_msgs.srv import SpawnEntity, DeleteEntity
 from std_srvs.srv import Empty
 
@@ -15,12 +16,12 @@ import numpy as np
 class GAZEBO_RL_ENV_NODE(Node):
     def __init__(self):
         super().__init__("gazebo_rl_env_node")
-        
+
         self.config = {
             "step_time_delta": 0.05,  # seconds
             "gazebo_service_timeout": 1.0,  # seconds
         }
-        
+
         self.current_timestamp = 0
 
         # Create the clients for the Gazebo services
@@ -29,6 +30,7 @@ class GAZEBO_RL_ENV_NODE(Node):
         self.reset_world_client = self.create_client(Empty, "/reset_world")
         self.spawn_entity_client = self.create_client(SpawnEntity, "/spawn_entity")
         self.delete_entity_client = self.create_client(DeleteEntity, "/delete_entity")
+        self.get_entity_state_client = self.create_client(GetEntityState, "/get_entity_state")
 
         # Load the ball URDF
         ball_urdf_path = os.path.join(get_package_share_directory("gazebo_rl_env"), "urdf", "ball.urdf")
@@ -81,7 +83,7 @@ class GAZEBO_RL_ENV_NODE(Node):
         while not self.delete_entity_client.wait_for_service(timeout_sec=self.config["gazebo_service_timeout"]):
             self.get_logger().info('Gazebo service "delete_entity" not available, waiting again...')
         self.delete_entity_client.call_async(self.delete_ball_request)
-    
+
     def spawn_kobuki(self, x: float, y: float, z: float, yaw: float):
         # Use system call to spawn the Kobuki robot
         os.system(f"ros2 run gazebo_ros spawn_entity.py -entity kobuki -topic /robot_description -x {x} -y {y} -z {z} -Y {yaw}")
@@ -89,8 +91,26 @@ class GAZEBO_RL_ENV_NODE(Node):
     def delete_kobuki(self):
         self.delete_kobuki_request = DeleteEntity.Request()
         self.delete_kobuki_request.name = "kobuki"
-        
+
         # Delete the Kobuki
         while not self.delete_entity_client.wait_for_service(timeout_sec=self.config["gazebo_service_timeout"]):
             self.get_logger().info('Gazebo service "delete_entity" not available, waiting again...')
         self.delete_entity_client.call_async(self.delete_kobuki_request)
+
+    def get_kobuki_state(self):
+        self.get_kobuki_state_request = GetEntityState.Request()
+        self.get_kobuki_state_request.name = "kobuki"
+
+        while not self.get_entity_state_client.wait_for_service(timeout_sec=self.config["gazebo_service_timeout"]):
+            self.get_logger().info('Gazebo service "get_entity_state" not available, waiting again...')
+        future = self.get_entity_state_client.call_async(self.get_kobuki_state_request)
+
+        # Get the response
+        rclpy.spin_until_future_complete(self, future)
+        response = future.result()
+
+        # Print the state
+        # kobuki_pose = response.state.pose
+        # self.get_logger().info(f"Kobuki position: ({kobuki_pose.position.x}, {kobuki_pose.position.y}, {kobuki_pose.position.z})")
+
+        return response.state

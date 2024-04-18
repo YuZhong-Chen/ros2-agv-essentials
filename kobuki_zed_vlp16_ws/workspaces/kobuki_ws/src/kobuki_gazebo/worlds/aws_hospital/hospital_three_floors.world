@@ -3792,5 +3792,11 @@
         <pose>1.30985 -0.727185 6.0 0 0 -1.53446</pose>
       </include>
     </model>
+
+    <!-- Enable Gazebo Global State -->
+    <plugin name="gazebo_ros_state" filename="libgazebo_ros_state.so">
+        <update_rate>5.0</update_rate>
+    </plugin>
+
   </world>
 </sdf>

@@ -232,6 +232,10 @@
       <direction>0.1 0.1 -1</direction>
     </light>
 
+    <!-- Enable Gazebo Global State -->
+    <plugin name="gazebo_ros_state" filename="libgazebo_ros_state.so">
+        <update_rate>5.0</update_rate>
+    </plugin>
 
   </world>
 </sdf>
