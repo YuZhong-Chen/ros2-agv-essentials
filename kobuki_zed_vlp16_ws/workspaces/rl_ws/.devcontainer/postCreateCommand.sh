@@ -4,3 +4,6 @@ sudo apt-get update
 # sudo rosdep install --from-paths src --ignore-src -y
 # sudo chown -R user /home/ros2-agv-essentials/
 # colcon build
+
+# Reference: https://github.com/horovod/horovod/issues/2187#issuecomment-1238239742
+sudo ldconfig
