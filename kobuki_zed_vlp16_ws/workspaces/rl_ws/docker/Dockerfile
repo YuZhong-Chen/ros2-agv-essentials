@@ -65,3 +65,6 @@ COPY .bashrc /home/$USERNAME/.bashrc
 # [Optional] Set the default user. Omit if you want to keep the default as root.
 USER $USERNAME
 CMD ["/bin/bash"]
+
+RUN git clone https://github.com/YuZhong-Chen/.setup_env.git ~/.setup_env && \
+    cd ~/.setup_env && ./install.sh ros2
