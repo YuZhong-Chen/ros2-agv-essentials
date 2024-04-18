@@ -1,4 +1,5 @@
 .vscode
+.hypothesis
 
 # ROS2 basic directories
 /build
