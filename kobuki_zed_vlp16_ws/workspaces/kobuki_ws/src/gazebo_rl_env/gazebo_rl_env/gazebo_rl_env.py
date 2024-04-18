@@ -15,6 +15,42 @@ import time
 import numpy as np
 
 
+class RESET_SERVICE(Node):
+    def __init__(self):
+        super().__init__("reset_service")
+
+        self.reset_service = self.create_service(Empty, "/rl_env/reset", self.reset_callback)
+        self.is_reset = False
+
+    def reset_callback(self, request, response):
+        self.is_reset = True
+
+        while self.is_reset:
+            # Wait for the reset to finish
+            # Note that the reset will be finished in the main thread
+            time.sleep(0.05)
+
+        return response
+
+
+class STEP_SERVICE(Node):
+    def __init__(self):
+        super().__init__("step_service")
+
+        self.step_service = self.create_service(Empty, "/rl_env/step", self.step_callback)
+        self.is_step = False
+
+    def step_callback(self, request, response):
+        self.is_step = True
+
+        while self.is_step:
+            # Wait for the step to finish
+            # Note that the step will be finished in the main thread
+            time.sleep(0.05)
+
+        return response
+
+
 class GAZEBO_RL_ENV_NODE(Node):
     def __init__(self):
         super().__init__("gazebo_rl_env_node")
@@ -47,6 +83,8 @@ class GAZEBO_RL_ENV_NODE(Node):
 
         self.target_list = self.generate_target()
 
+        self.reset()
+
     def reset(self):
         self.current_timestamp = 0
         self.current_reward = 0.0
@@ -54,6 +92,16 @@ class GAZEBO_RL_ENV_NODE(Node):
         while not self.reset_world_client.wait_for_service(timeout_sec=self.config["gazebo_service_timeout"]):
             self.get_logger().info('Gazebo service "reset_world" not available, waiting again...')
         self.reset_world_client.call_async(Empty.Request())
+
+        # Wait for the world stable
+        time.sleep(1.0)
+
+        # Pause the physics to stop the simulation at the beginning
+        while not self.pause_client.wait_for_service(timeout_sec=self.config["gazebo_service_timeout"]):
+            self.get_logger().info('Gazebo service "pause" not available, waiting again...')
+        self.pause_client.call_async(Empty.Request())
+
+        self.get_logger().info("Reset environment.")
 
     def step(self):
         self.current_timestamp += 1
@@ -86,7 +134,7 @@ class GAZEBO_RL_ENV_NODE(Node):
                 self.target_list.remove(target)
                 self.current_reward = self.config["target_reward"]
                 self.get_logger().info(f"Kobuki reaches target {target.name} at timestamp {self.current_timestamp}")
-        
+
         # Publish the information
         self.publish_info()
 
@@ -131,11 +179,17 @@ class GAZEBO_RL_ENV_NODE(Node):
 
         while not self.get_entity_state_client.wait_for_service(timeout_sec=self.config["gazebo_service_timeout"]):
             self.get_logger().info('Gazebo service "get_entity_state" not available, waiting again...')
-        future = self.get_entity_state_client.call_async(self.get_kobuki_state_request)
 
-        # Get the response
-        rclpy.spin_until_future_complete(self, future)
-        response = future.result()
+        response = None
+        while response is None:
+            future = self.get_entity_state_client.call_async(self.get_kobuki_state_request)
+
+            # Get the response
+            rclpy.spin_until_future_complete(self, future, timeout_sec=self.config["gazebo_service_timeout"])
+            response = future.result()
+
+            if response is None:
+                self.get_logger().info('Gazebo service "get_entity_state" call failed, waiting again...')
 
         # Print the state
         # kobuki_pose = response.state.pose
