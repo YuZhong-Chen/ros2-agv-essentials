@@ -14,6 +14,35 @@ import math
 import time
 import numpy as np
 
+timestamp = 0
+reward = 0
+observation = None
+
+
+class OBSERVATION_SUBSCRIBER(Node):
+    def __init__(self):
+        super().__init__("observation_subscriber")
+        self.observation_subscriber = self.create_subscription(Image, "/zed/zed_node/left/image_rect_color", self.observation_callback, 10)
+
+        # OpenCV bridge
+        # Reference: https://wiki.ros.org/cv_bridge
+        self.cv_bridge = CvBridge()
+
+    def observation_callback(self, msg):
+        global observation
+        observation = self.cv_bridge.imgmsg_to_cv2(msg, desired_encoding="rgb8")
+
+
+class ENV_INFO_SUBSCRIBER(Node):
+    def __init__(self):
+        super().__init__("env_info_subscriber")
+        self.env_info_subscriber = self.create_subscription(Float32MultiArray, "/rl_env/info", self.env_info_callback, 10)
+
+    def env_info_callback(self, msg):
+        global timestamp, reward
+        timestamp = msg.data[0]
+        reward = msg.data[1]
+
 
 class RL_ENV(Node):
     def __init__(self):
@@ -26,20 +55,9 @@ class RL_ENV(Node):
         # Create a publisher for the action
         self.action_publisher = self.create_publisher(Twist, "/cmd_vel", 10)
 
-        # Create a subscriber for the observation
-        self.observation = Image()
-        self.observation_subscriber = self.create_subscription(Image, "/zed/zed_node/left/image_rect_color", self.observation_callback, 10)
-
-        # Create a subscriber for the env info
-        self.env_info_subscriber = self.create_subscription(Float32MultiArray, "/rl_env/info", self.env_info_callback, 10)
-
         # Create a service client for controlling the env
         self.step_service = self.create_client(Empty, "/rl_env/step")
         self.reset_service = self.create_client(Empty, "/rl_env/reset")
-
-        # OpenCV bridge
-        # Reference: https://wiki.ros.org/cv_bridge
-        self.cv_bridge = CvBridge()
 
         # Action space
         # 0 - stop
@@ -52,13 +70,6 @@ class RL_ENV(Node):
 
         self.timestamp = 0
         self.reward = 0
-
-    def observation_callback(self, msg):
-        self.observation = self.cv_bridge.imgmsg_to_cv2(msg, desired_encoding="rgb8")
-
-    def env_info_callback(self, msg):
-        self.timestamp = msg.data[0]
-        self.reward = msg.data[1]
 
     def publish_action(self, action: int):
         twist = Twist()
@@ -88,18 +99,25 @@ class RL_ENV(Node):
         # Call the reset service
         while not self.reset_service.wait_for_service(timeout_sec=self.config["service_timeout"]):
             self.get_logger().info('Env service "reset" not available, waiting again...')
-        
+
         future = self.reset_service.call_async(Empty.Request())
         rclpy.spin_until_future_complete(self, future)
 
     def step(self, action: int):
+        global observation, reward
+
+        observation = reward = None
         self.publish_action(action)
 
         # Call the step service
         while not self.step_service.wait_for_service(timeout_sec=self.config["service_timeout"]):
             self.get_logger().info('Env service "step" not available, waiting again...')
-        
+
         future = self.step_service.call_async(Empty.Request())
         rclpy.spin_until_future_complete(self, future)
 
-        return self.observation, self.reward, False
+        while observation is None or reward is None:
+            self.get_logger().info(f"Waiting for data... {reward}")
+            time.sleep(0.05)
+
+        return observation, reward, False

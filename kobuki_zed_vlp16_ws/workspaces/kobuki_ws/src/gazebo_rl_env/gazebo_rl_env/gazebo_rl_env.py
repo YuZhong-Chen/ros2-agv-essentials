@@ -56,7 +56,7 @@ class GAZEBO_RL_ENV_NODE(Node):
         super().__init__("gazebo_rl_env_node")
 
         self.config = {
-            "step_time_delta": 0.05,  # seconds
+            "step_time_delta": 0.5,  # seconds
             "gazebo_service_timeout": 1.0,  # seconds
             "reach_target_distance": 0.2,  # meters
             "target_reward": 100,
