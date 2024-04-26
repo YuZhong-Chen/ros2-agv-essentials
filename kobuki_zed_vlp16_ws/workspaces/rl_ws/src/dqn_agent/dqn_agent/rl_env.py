@@ -103,8 +103,15 @@ class RL_ENV(Node):
         future = self.reset_service.call_async(Empty.Request())
         rclpy.spin_until_future_complete(self, future)
 
+        # Call the step service for the first time
+        observation, _, _ = self.step(0)
+        return observation
+
     def step(self, action: int):
         global observation, reward
+
+        old_observation = observation
+        old_reward = reward
 
         observation = reward = None
         self.publish_action(action)
@@ -116,8 +123,13 @@ class RL_ENV(Node):
         future = self.step_service.call_async(Empty.Request())
         rclpy.spin_until_future_complete(self, future)
 
-        while observation is None or reward is None:
-            self.get_logger().info(f"Waiting for data... {reward}")
-            time.sleep(0.05)
+        for _ in range(20):
+            if observation is None or reward is None:
+                # self.get_logger().info(f'Env service "step" is waiting for data...')
+                time.sleep(0.05)
+
+        if observation is None or reward is None:
+            self.get_logger().error('Env service "step" failed to receive data, use the old data.')
+            return old_observation, old_reward, True
 
         return observation, reward, False
