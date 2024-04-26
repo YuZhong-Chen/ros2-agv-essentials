@@ -1,6 +1,9 @@
 .vscode
 .hypothesis
 
+# Model files
+/checkpoints
+
 # ROS2 basic directories
 /build
 /install

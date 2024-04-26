@@ -60,6 +60,10 @@ RUN locale-gen en_US en_US.UTF-8 \
 # Reference : https://forums.developer.nvidia.com/t/unable-to-import-pytorch/154016
 RUN apt-get install -y libopenblas-base
 
+# Install python packages
+RUN pip3 install \
+    wandb
+
 COPY .bashrc /home/$USERNAME/.bashrc
 
 # [Optional] Set the default user. Omit if you want to keep the default as root.
